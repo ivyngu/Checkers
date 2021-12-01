@@ -1,5 +1,8 @@
 package org.cis120.checkers;
 
+import java.awt.*;
+import java.util.LinkedList;
+
 /**
  * This class is a model for Checkers.
  *
@@ -7,15 +10,26 @@ package org.cis120.checkers;
 public class Checkers {
 
     private int[][] board;
-    private int numTurns;
     private boolean player1;
     private boolean gameOver;
+    private int player1Pieces;
+    private int player2Pieces;
+    private LinkedList<Point> player1Moves;
+    private LinkedList<Point> player2Moves;
 
     /**
      * Constructor sets up game state.
      */
     public Checkers() {
         reset();
+    }
+
+    public void undo() {
+
+    }
+
+    public void switchPlayers() {
+
     }
 
     /**
@@ -40,7 +54,6 @@ public class Checkers {
             board[r][c] = 2;
         }
 
-        numTurns++;
         if (checkWinner() == 0) {
             player1 = !player1;
         }
@@ -48,30 +61,16 @@ public class Checkers {
     }
 
     /**
-     * checkWinner checks whether the game has reached a win condition.
-     * checkWinner only looks for horizontal wins.
+     * checkWinner checks whether the game has reached a win condition (one player loses all their pieces).
      *
      * @return 0 if nobody has won yet, 1 if player 1 has won, and 2 if player 2
      *         has won, 3 if the game hits stalemate
      */
     public int checkWinner() {
-        // Check horizontal win
-        for (int i = 0; i < board.length; i++) {
-            if (board[i][0] == board[i][1] &&
-                    board[i][1] == board[i][2] &&
-                    board[i][1] != 0) {
-                gameOver = true;
-                if (player1) {
-                    return 1;
-                } else {
-                    return 2;
-                }
-            }
-        }
-
-        if (numTurns >= 9) {
-            gameOver = true;
-            return 3;
+        if (player1Pieces == 0) {
+            return 2;
+        } else if (player2Pieces == 0) {
+            return 1;
         } else {
             return 0;
         }
@@ -82,7 +81,6 @@ public class Checkers {
      * for debugging.
      */
     public void printGameState() {
-        System.out.println("\n\nTurn " + numTurns + ":\n");
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 System.out.print(board[i][j]);
@@ -100,10 +98,11 @@ public class Checkers {
      * reset (re-)sets the game state to start a new game.
      */
     public void reset() {
-        board = new int[3][3];
-        numTurns = 0;
+        board = new int[8][8];
         player1 = true;
         gameOver = false;
+        player1Pieces = 12;
+        player2Pieces = 12;
     }
 
     /**

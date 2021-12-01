@@ -17,8 +17,8 @@ public class GameBoard extends JPanel {
     private JLabel status; // current status text
 
     // Game constants
-    public static final int BOARD_WIDTH = 300;
-    public static final int BOARD_HEIGHT = 300;
+    public static final int BOARD_WIDTH = 800;
+    public static final int BOARD_HEIGHT = 800;
 
     /**
      * Initializes the game board.
@@ -64,6 +64,14 @@ public class GameBoard extends JPanel {
         requestFocusInWindow();
     }
 
+    public void undo() {
+        checkers.undo();
+    }
+
+    public void switchPlayers() {
+        checkers.switchPlayers();
+    }
+
     /**
      * Updates the JLabel to reflect the current state of the game.
      */
@@ -97,26 +105,66 @@ public class GameBoard extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         // Draws board grid
-        g.drawLine(100, 0, 100, 300);
-        g.drawLine(200, 0, 200, 300);
-        g.drawLine(0, 100, 300, 100);
-        g.drawLine(0, 200, 300, 200);
+        drawBoard(g);
+        drawBlackCheckers(g);
+        // drawCheckerPieces(g);
+    }
 
-        // Draws X's and O's
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                int state = checkers.getCell(j, i);
-                if (state == 1) {
-                    g.drawOval(30 + 100 * j, 30 + 100 * i, 40, 40);
-                } else if (state == 2) {
-                    g.drawLine(30 + 100 * j, 30 + 100 * i, 70 + 100 * j, 70 + 100 * i);
-                    g.drawLine(30 + 100 * j, 70 + 100 * i, 70 + 100 * j, 30 + 100 * i);
+    public void drawBoard(Graphics g) {
+        g.drawLine(100, 0, 100, 800);
+        g.drawLine(200, 0, 200, 800);
+        g.drawLine(0, 100, 800, 100);
+        g.drawLine(0, 200, 800, 200);
+        g.drawLine(300, 0, 300, 800);
+        g.drawLine(400, 0, 400, 800);
+        g.drawLine(0, 300, 800, 300);
+        g.drawLine(0, 400, 800, 400);
+        g.drawLine(500, 0, 500, 800);
+        g.drawLine(600, 0, 600, 800);
+        g.drawLine(0, 500, 800, 500);
+        g.drawLine(0, 600, 800, 600);
+        g.drawLine(700, 0, 700, 800);
+        g.drawLine(800, 0, 800, 800);
+        g.drawLine(0, 700, 800, 700);
+        g.drawLine(0, 800, 800, 800);
+    }
+
+    public void drawBlackCheckers(Graphics g) {
+        g.setColor(Color.black);
+        for (int r = 0; r < BOARD_WIDTH; r = r + 200) {
+            for (int c = 0; c < BOARD_HEIGHT; c = c + 200) {
+                g.fillRect(r, c, 100, 100);
+            }
+        }
+        for (int r = 100; r < BOARD_WIDTH; r = r + 200) {
+            for (int c = 100; c < BOARD_HEIGHT; c = c + 200) {
+                g.fillRect(r, c, 100, 100);
+            }
+        }
+    }
+
+    public void drawCheckerPieces(Graphics g) {
+        for (int r = 0; r < BOARD_WIDTH; r=r+100) {
+            for (int c = 0; c < BOARD_HEIGHT; c=c+100) {
+                int player = checkers.getCell(c, r);
+                if (player == 1) {
+                    g.setColor(Color.white);
+                    g.drawOval(30 + 100 * c, 30 + 100 * r, 40, 40);
+                } else if (player == 2) {
+                    g.setColor(Color.black);
+                    g.drawOval(30 + 100 * c, 30 + 100 * r, 40, 40);
+                } else if (player == 3) {
+                    g.setColor(Color.BLUE);
+                    g.drawOval(30 + 100 * c, 30 + 100 * r, 40, 40);
+                } else if (player == 4) {
+                    g.setColor(Color.yellow);
+                    g.drawOval(30 + 100 * c, 30 + 100 * r, 40, 40);
                 }
             }
         }
     }
+
 
     /**
      * Returns the size of the game board.

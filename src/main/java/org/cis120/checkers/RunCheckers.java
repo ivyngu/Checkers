@@ -10,11 +10,9 @@ import java.awt.event.ActionListener;
 
 public class RunCheckers implements Runnable {
     public void run() {
-        // NOTE: the 'final' keyword denotes immutability even for local variables.
-
         // Top-level frame in which game components live
         final JFrame frame = new JFrame("Checkers");
-        frame.setLocation(300, 300);
+        frame.setLocation(800, 800);
 
         // Status panel
         final JPanel status_panel = new JPanel();
@@ -29,7 +27,6 @@ public class RunCheckers implements Runnable {
         // Reset button
         final JPanel control_panel = new JPanel();
         frame.add(control_panel, BorderLayout.NORTH);
-
         // Note here that when we add an action listener to the reset button, we
         // define it as an anonymous inner class that is an instance of
         // ActionListener with its actionPerformed() method overridden. When the
@@ -41,6 +38,23 @@ public class RunCheckers implements Runnable {
             }
         });
         control_panel.add(reset);
+
+        // Undo button
+        final JButton undo = new JButton("Undo");
+        undo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                board.undo();
+            }
+        });
+        control_panel.add(undo);
+
+        final JButton confirm = new JButton("Confirm");
+        undo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                board.switchPlayers();
+            }
+        });
+        control_panel.add(confirm);
 
         // Put the frame on the screen
         frame.pack();
