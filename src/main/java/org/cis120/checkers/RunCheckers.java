@@ -56,6 +56,23 @@ public class RunCheckers implements Runnable {
         });
         control_panel.add(confirm);
 
+        final JButton instructions = new JButton("How To Play");
+        instructions.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane jp = new JOptionPane();
+                JButton close = new JButton("Close");
+                jp.showMessageDialog(close, "Rules of Checkers\n" +
+                        "1. Checker pieces can only move diagonally on black tiles.\n" +
+                        "2. Regular checker pieces may only move forward diagonally.\n" +
+                        "3. A checker piece can become a king once it reaches the opponent's end and " +
+                        "cannot move forward anymore. A king can move backwards and forwards diagonally.\n" +
+                        "4. The game is over once one player runs out of all their checkers.\n" +
+                        "5. The player with black checkers moves first.\n"
+                );
+            }
+        });
+        control_panel.add(instructions);
+
         // Put the frame on the screen
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -1,5 +1,7 @@
 package org.cis120;
 
+import org.cis120.checkers.Checkers;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;

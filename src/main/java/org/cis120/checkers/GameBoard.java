@@ -108,7 +108,7 @@ public class GameBoard extends JPanel {
         // Draws board grid
         drawBoard(g);
         drawBlackCheckers(g);
-        // drawCheckerPieces(g);
+        drawCheckerPieces(g);
     }
 
     public void drawBoard(Graphics g) {
@@ -132,36 +132,46 @@ public class GameBoard extends JPanel {
 
     public void drawBlackCheckers(Graphics g) {
         g.setColor(Color.black);
-        for (int r = 0; r < BOARD_WIDTH; r = r + 200) {
-            for (int c = 0; c < BOARD_HEIGHT; c = c + 200) {
+        for (int r = 0; r < 800; r = r + 200) {
+            for (int c = 0; c < 800; c = c + 200) {
                 g.fillRect(r, c, 100, 100);
             }
         }
-        for (int r = 100; r < BOARD_WIDTH; r = r + 200) {
-            for (int c = 100; c < BOARD_HEIGHT; c = c + 200) {
+        for (int r = 100; r < 800; r = r + 200) {
+            for (int c = 100; c < 800; c = c + 200) {
                 g.fillRect(r, c, 100, 100);
             }
         }
     }
 
     public void drawCheckerPieces(Graphics g) {
-        for (int r = 0; r < BOARD_WIDTH; r=r+100) {
-            for (int c = 0; c < BOARD_HEIGHT; c=c+100) {
-                int player = checkers.getCell(c, r);
+        for (int r = 0; r < 800; r=r+100) {
+            for (int c = 0; c < 800; c=c+100) {
+                int row = returnClipped(r);
+                int col = returnClipped(c);
+                int player = checkers.getCell(col, row);
                 if (player == 1) {
                     g.setColor(Color.white);
-                    g.drawOval(30 + 100 * c, 30 + 100 * r, 40, 40);
+                    g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
                 } else if (player == 2) {
-                    g.setColor(Color.black);
-                    g.drawOval(30 + 100 * c, 30 + 100 * r, 40, 40);
+                    g.setColor(Color.red);
+                    g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
                 } else if (player == 3) {
                     g.setColor(Color.BLUE);
-                    g.drawOval(30 + 100 * c, 30 + 100 * r, 40, 40);
+                    g.fillOval(30 * c, 30 * r, 40, 40);
                 } else if (player == 4) {
                     g.setColor(Color.yellow);
-                    g.drawOval(30 + 100 * c, 30 + 100 * r, 40, 40);
+                    g.fillOval(30 * c, 30 * r, 40, 40);
                 }
             }
+        }
+    }
+
+    public int returnClipped(int v) {
+        if (v == 0) {
+            return 0;
+        } else {
+            return v / 100;
         }
     }
 

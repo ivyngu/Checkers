@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class Checkers {
 
     private int[][] board;
-    private boolean player1;
+    private boolean player1Turn;
     private boolean gameOver;
     private int player1Pieces;
     private int player2Pieces;
@@ -28,9 +28,47 @@ public class Checkers {
 
     }
 
+    /**
+     * Moves onto the next player's turn once the current player confirms they are done with their turn.
+     */
     public void switchPlayers() {
-
+        player1Turn = !player1Turn;
     }
+
+    /**
+     *
+     */
+    public boolean jumpPossible() {
+        return false;
+    }
+
+    public void fillInBoardWithBlackPieces() {
+        for (int r = 0; r < 3; r=r+2) {
+            for (int c = 0; c < 8; c=c+2) {
+                board[r][c] = 1;
+            }
+        }
+        for (int r = 1; r < 3; r=r+2) {
+            for (int c = 1; c < 8; c=c+2) {
+                board[r][c] = 1;
+            }
+        }
+    }
+
+    public void fillInBoardWithWhitePieces() {
+        for (int r = 5; r < 8; r=r+2) {
+            for (int c = 1; c < 8; c=c+2) {
+                board[r][c] = 2;
+            }
+        }
+        for (int r = 6; r < 8; r=r+2) {
+            for (int c = 0; c < 8; c=c+2) {
+                board[r][c] = 2;
+            }
+        }
+    }
+
+
 
     /**
      * playTurn allows players to play a turn. Returns true if the move is
@@ -48,14 +86,10 @@ public class Checkers {
             return false;
         }
 
-        if (player1) {
+        if (player1Turn) {
             board[r][c] = 1;
         } else {
             board[r][c] = 2;
-        }
-
-        if (checkWinner() == 0) {
-            player1 = !player1;
         }
         return true;
     }
@@ -99,7 +133,9 @@ public class Checkers {
      */
     public void reset() {
         board = new int[8][8];
-        player1 = true;
+        fillInBoardWithBlackPieces();
+        fillInBoardWithWhitePieces();
+        player1Turn = true;
         gameOver = false;
         player1Pieces = 12;
         player2Pieces = 12;
@@ -113,7 +149,7 @@ public class Checkers {
      *         false if it's Player 2's turn.
      */
     public boolean getCurrentPlayer() {
-        return player1;
+        return player1Turn;
     }
 
     /**
