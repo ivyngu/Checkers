@@ -42,12 +42,22 @@ public class GameBoard extends JPanel {
             @Override
             public void mouseReleased(MouseEvent e) {
                 Point p = e.getPoint();
-
                 // updates the model given the coordinates of the mouseclick
-                checkers.playTurn(p.x / 100, p.y / 100);
-
+                checkers.selectPieceToMove(p.x / 100, p.y / 100);
                 updateStatus(); // updates the status JLabel
                 repaint(); // repaints the game board
+
+            }
+        });
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                Point p = e.getPoint();
+                // updates the model given the coordinates of the mouseclick
+                checkers.selectPieceToMoveTo(p.x / 100, p.y / 100);
+                updateStatus(); // updates the status JLabel
+                repaint(); // repaints the game board
+
             }
         });
     }
@@ -59,13 +69,23 @@ public class GameBoard extends JPanel {
         checkers.reset();
         status.setText("Player 1's Turn");
         repaint();
-
         // Makes sure this component has keyboard/mouse focus
         requestFocusInWindow();
     }
 
     public void undo() {
         checkers.undo();
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                Point p = e.getPoint();
+                // updates the model given the coordinates of the mouseclick
+                checkers.selectPieceToMove(p.x / 100, p.y / 100);
+                updateStatus(); // updates the status JLabel
+                repaint(); // repaints the game board
+
+            }
+        });
     }
 
     public void switchPlayers() {
@@ -108,6 +128,7 @@ public class GameBoard extends JPanel {
         // Draws board grid
         drawBoard(g);
         drawBlackCheckers(g);
+        drawWhiteCheckers(g);
         drawCheckerPieces(g);
     }
 
@@ -144,6 +165,20 @@ public class GameBoard extends JPanel {
         }
     }
 
+    public void drawWhiteCheckers(Graphics g) {
+        g.setColor(Color.white);
+        for (int r = 0; r < 800; r = r + 200) {
+            for (int c = 100; c < 800; c = c + 200) {
+                g.fillRect(r, c, 100, 100);
+            }
+        }
+        for (int r = 100; r < 800; r = r + 200) {
+            for (int c = 0; c < 800; c = c + 200) {
+                g.fillRect(r, c, 100, 100);
+            }
+        }
+    }
+
     public void drawCheckerPieces(Graphics g) {
         for (int r = 0; r < 800; r=r+100) {
             for (int c = 0; c < 800; c=c+100) {
@@ -151,16 +186,19 @@ public class GameBoard extends JPanel {
                 int col = returnClipped(c);
                 int player = checkers.getCell(col, row);
                 if (player == 1) {
-                    g.setColor(Color.white);
+                    g.setColor(Color.red);
                     g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
                 } else if (player == 2) {
-                    g.setColor(Color.red);
+                    g.setColor(Color.white);
                     g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
                 } else if (player == 3) {
                     g.setColor(Color.BLUE);
                     g.fillOval(30 * c, 30 * r, 40, 40);
                 } else if (player == 4) {
                     g.setColor(Color.yellow);
+                    g.fillOval(30 * c, 30 * r, 40, 40);
+                } else if (player == 5) {
+                    g.setColor(Color.BLUE);
                     g.fillOval(30 * c, 30 * r, 40, 40);
                 }
             }

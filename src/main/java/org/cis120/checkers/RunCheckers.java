@@ -27,10 +27,6 @@ public class RunCheckers implements Runnable {
         // Reset button
         final JPanel control_panel = new JPanel();
         frame.add(control_panel, BorderLayout.NORTH);
-        // Note here that when we add an action listener to the reset button, we
-        // define it as an anonymous inner class that is an instance of
-        // ActionListener with its actionPerformed() method overridden. When the
-        // button is pressed, actionPerformed() will be called.
         final JButton reset = new JButton("Reset");
         reset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -48,14 +44,16 @@ public class RunCheckers implements Runnable {
         });
         control_panel.add(undo);
 
+        // Confirm done with turn button
         final JButton confirm = new JButton("Confirm");
-        undo.addActionListener(new ActionListener() {
+        confirm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 board.switchPlayers();
             }
         });
         control_panel.add(confirm);
 
+        // Instructions of game button
         final JButton instructions = new JButton("How To Play");
         instructions.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -72,6 +70,15 @@ public class RunCheckers implements Runnable {
             }
         });
         control_panel.add(instructions);
+
+        // Quit Button
+        final JButton quit = new JButton("Quit");
+        quit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        control_panel.add(quit);
 
         // Put the frame on the screen
         frame.pack();
