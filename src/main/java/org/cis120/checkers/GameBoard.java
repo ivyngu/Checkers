@@ -46,6 +46,8 @@ public class GameBoard extends JPanel {
                 checkers.selectPieceToMove(p.x / 100, p.y / 100);
                 updateStatus(); // updates the status JLabel
                 repaint(); // repaints the game board
+                System.out.println("Game state when clicking piece:");
+            checkers.printGameState();
 
             }
         });
@@ -57,7 +59,8 @@ public class GameBoard extends JPanel {
                 checkers.selectPieceToMoveTo(p.x / 100, p.y / 100);
                 updateStatus(); // updates the status JLabel
                 repaint(); // repaints the game board
-
+                System.out.println("Game state when moving piece:");
+                checkers.printGameState();
             }
         });
     }
@@ -67,7 +70,7 @@ public class GameBoard extends JPanel {
      */
     public void reset() {
         checkers.reset();
-        status.setText("Player 1's Turn");
+        status.setText("Red Player's Turn");
         repaint();
         // Makes sure this component has keyboard/mouse focus
         requestFocusInWindow();
@@ -75,6 +78,7 @@ public class GameBoard extends JPanel {
 
     public void undo() {
         checkers.undo();
+        repaint();
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -83,7 +87,16 @@ public class GameBoard extends JPanel {
                 checkers.selectPieceToMove(p.x / 100, p.y / 100);
                 updateStatus(); // updates the status JLabel
                 repaint(); // repaints the game board
-
+            }
+        });
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                Point p = e.getPoint();
+                // updates the model given the coordinates of the mouseclick
+                checkers.selectPieceToMoveTo(p.x / 100, p.y / 100);
+                updateStatus(); // updates the status JLabel
+                repaint(); // repaints the game board
             }
         });
     }
@@ -95,18 +108,19 @@ public class GameBoard extends JPanel {
     /**
      * Updates the JLabel to reflect the current state of the game.
      */
-    private void updateStatus() {
+    public void updateStatus() {
         if (checkers.getCurrentPlayer()) {
-            status.setText("Player 1's Turn");
+            status.setText("Red Player's Turn");
         } else {
-            status.setText("Player 2's Turn");
+            status.setText("White Player's Turn");
         }
-
+        System.out.println("Red:" + checkers.getPlayerRedPieces());
+        System.out.println("White" + checkers.getPlayerWhitePieces());
         int winner = checkers.checkWinner();
         if (winner == 1) {
-            status.setText("Player 1 wins!!!");
+            status.setText("Red Player wins!");
         } else if (winner == 2) {
-            status.setText("Player 2 wins!!!");
+            status.setText("White Player wins!");
         } else if (winner == 3) {
             status.setText("It's a tie.");
         }
@@ -192,14 +206,13 @@ public class GameBoard extends JPanel {
                     g.setColor(Color.white);
                     g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
                 } else if (player == 3) {
-                    g.setColor(Color.BLUE);
-                    g.fillOval(30 * c, 30 * r, 40, 40);
+                    g.setColor(Color.red);
+                    g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
+                    g.drawString("K", 30 + 100 * col, 30 + 100 * row);
                 } else if (player == 4) {
-                    g.setColor(Color.yellow);
-                    g.fillOval(30 * c, 30 * r, 40, 40);
-                } else if (player == 5) {
-                    g.setColor(Color.BLUE);
-                    g.fillOval(30 * c, 30 * r, 40, 40);
+                    g.setColor(Color.white);
+                    g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
+                    g.drawString("K", 30 + 100 * col, 30 + 100 * row);
                 }
             }
         }
@@ -212,7 +225,6 @@ public class GameBoard extends JPanel {
             return v / 100;
         }
     }
-
 
     /**
      * Returns the size of the game board.

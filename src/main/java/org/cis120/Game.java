@@ -14,5 +14,6 @@ public class Game {
     public static void main(String[] args) {
         Runnable game = new org.cis120.checkers.RunCheckers();
         SwingUtilities.invokeLater(game);
+        Checkers c = new Checkers();
     }
 }

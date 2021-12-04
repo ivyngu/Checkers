@@ -49,6 +49,7 @@ public class RunCheckers implements Runnable {
         confirm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 board.switchPlayers();
+                board.updateStatus();
             }
         });
         control_panel.add(confirm);
@@ -65,20 +66,21 @@ public class RunCheckers implements Runnable {
                         "3. A checker piece can become a king once it reaches the opponent's end and " +
                         "cannot move forward anymore. A king can move backwards and forwards diagonally.\n" +
                         "4. The game is over once one player runs out of all their checkers.\n" +
-                        "5. The player with black checkers moves first.\n"
+                        "5. The player with black checkers moves first.\n" +
+                        "6. If a player can skip a checker piece, they are only allowed to skip one at once."
                 );
             }
         });
         control_panel.add(instructions);
 
-        // Quit Button
-        final JButton quit = new JButton("Quit");
-        quit.addActionListener(new ActionListener() {
+        // Save Button
+        final JButton save = new JButton("Save");
+        save.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
             }
         });
-        control_panel.add(quit);
+        control_panel.add(save);
 
         // Put the frame on the screen
         frame.pack();
