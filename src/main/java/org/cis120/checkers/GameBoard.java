@@ -38,6 +38,10 @@ public class GameBoard extends JPanel {
          * Listens for mouseclicks. Updates the model, then updates the game
          * board based off of the updated model.
          */
+        addMouseListeners();
+    }
+
+    public void addMouseListeners() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -45,9 +49,9 @@ public class GameBoard extends JPanel {
                 // updates the model given the coordinates of the mouseclick
                 checkers.selectPieceToMove(p.x / 100, p.y / 100);
                 updateStatus(); // updates the status JLabel
-                repaint(); // repaints the game board
+                //repaint(); // repaints the game board
                 System.out.println("Game state when clicking piece:");
-            checkers.printGameState();
+                checkers.printGameState();
 
             }
         });
@@ -79,26 +83,7 @@ public class GameBoard extends JPanel {
     public void undo() {
         checkers.undo();
         repaint();
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                Point p = e.getPoint();
-                // updates the model given the coordinates of the mouseclick
-                checkers.selectPieceToMove(p.x / 100, p.y / 100);
-                updateStatus(); // updates the status JLabel
-                repaint(); // repaints the game board
-            }
-        });
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                Point p = e.getPoint();
-                // updates the model given the coordinates of the mouseclick
-                checkers.selectPieceToMoveTo(p.x / 100, p.y / 100);
-                updateStatus(); // updates the status JLabel
-                repaint(); // repaints the game board
-            }
-        });
+        addMouseListeners();
     }
 
     public void switchPlayers() {
@@ -194,6 +179,7 @@ public class GameBoard extends JPanel {
     }
 
     public void drawCheckerPieces(Graphics g) {
+        checkers.printGameState();
         for (int r = 0; r < 800; r=r+100) {
             for (int c = 0; c < 800; c=c+100) {
                 int row = returnClipped(r);

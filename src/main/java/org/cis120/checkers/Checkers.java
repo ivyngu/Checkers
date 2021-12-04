@@ -337,22 +337,13 @@ public class Checkers {
         return moves;
     }
 
-    /**
-     * Helper function to reset board accordingly back to original state once a move has been made by
-     * checker piece.
-     * @param c - column of current checker piece
-     * @param r - row of current checker piece
-     */
-    private void resetOldPossibleMoves(int oldC, int oldR, int c, int r) {
-        ArrayList<Move> movesExcludingOld = new ArrayList<Move>();
-        ArrayList<Move> oldMoves = findPossibleMoves(oldC, oldR);
-        for (Move move : oldMoves) {
-            if (!move.equals(c, r)) {
-                movesExcludingOld.add(move);
+    private void resetOldPossibleMoves() {
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                if (board[r][c] == 5) {
+                    board[r][c] = 0;
+                }
             }
-        }
-        for (Move oneMove : movesExcludingOld) {
-            board[oneMove.getY()][oneMove.getX()] = 0;
         }
     }
 
@@ -387,7 +378,7 @@ public class Checkers {
                     playerWhitePieces--;
                 }
             }
-            resetOldPossibleMoves(lastC, lastR, c, r);
+            resetOldPossibleMoves();
             // clear the last location
             board[lastMove.getY()][lastMove.getX()] = 0;
             // finally add this move to the list of moves made by player
@@ -406,7 +397,7 @@ public class Checkers {
                     playerRedPieces--;
                 }
             }
-            resetOldPossibleMoves(lastMove.getX(), lastMove.getY(), c, r);
+           resetOldPossibleMoves();
             board[lastMove.getY()][lastMove.getX()] = 0;
             playerWhiteMoves.add(new Move(c,r));
         }
@@ -513,10 +504,8 @@ public class Checkers {
     public void undo() {
         if (playerRedTurn) {
             Move lastMove = playerRedMoves.getLast();
-            Move lastLastMove = playerRedMoves.get(playerRedMoves.size() - 2);
             int identity = getCell(lastMove.getX(), lastMove.getY());
-            //resetOldPossibleMoves((findPossibleMoves(lastLastMove.getX(), lastLastMove.getY())),
-                   // lastMove.getX(), lastMove.getY());
+
             board[lastMove.getY()][lastMove.getX()] = 0;
             playerRedMoves.removeLast();
             Move secondLastMove = playerRedMoves.getLast();
@@ -527,10 +516,7 @@ public class Checkers {
             }
         } else if (!playerRedTurn) {
             Move lastMove = playerWhiteMoves.getLast();
-            Move lastLastMove = playerWhiteMoves.get(playerWhiteMoves.size() - 2);
             int identity = getCell(lastMove.getX(), lastMove.getY());
-            //resetOldPossibleMoves((findPossibleMoves(lastLastMove.getX(), lastLastMove.getY())),
-                    //lastMove.getX(), lastMove.getY());
             board[lastMove.getY()][lastMove.getX()] = 0;
             playerRedMoves.removeLast();
             Move secondLastMove = playerRedMoves.getLast();
