@@ -1,23 +1,39 @@
 package org.cis120.checkers;
 
 public class Move {
-    private int x;
-    private int y;
+    private int c;
+    private int r;
+    private boolean wasJump;
+    private int identity;
 
-    public Move(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public Move(int c, int r) {
+        this.c = c;
+        this.r = r;
+        wasJump = false;
+        identity = 0;
     }
 
-    public int getX() {
-        return x;
+    public int getC() {
+        return c;
     }
 
-    public int getY() {
-        return y;
+    public int getR() {
+        return r;
     }
 
-    public boolean equals(int x, int y) {
-        return (this.x == x && this.y == y);
+    public boolean getWasJump() {
+        return wasJump;
+    }
+
+    public int getIdentity() {
+        return identity;
+    }
+
+    public void setIdentity(int i) {
+        identity = i;
+    }
+
+    public void setWasJump(boolean jump) {
+        wasJump = jump;
     }
 }

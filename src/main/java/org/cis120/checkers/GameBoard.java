@@ -1,8 +1,11 @@
 package org.cis120.checkers;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * This class instantiates a Checkers object, which is the model for the game.
@@ -13,10 +16,10 @@ import java.awt.event.MouseEvent;
 @SuppressWarnings("serial")
 public class GameBoard extends JPanel {
 
-    private Checkers checkers; // model for the game
-    private JLabel status; // current status text
+    private final Checkers checkers; // model for the game
+    private final JLabel status; // current status text
 
-    // Game constants
+    // game constants
     public static final int BOARD_WIDTH = 800;
     public static final int BOARD_HEIGHT = 800;
 
@@ -31,40 +34,42 @@ public class GameBoard extends JPanel {
         // keyboard focus, key events are handled by its key listener.
         setFocusable(true);
 
-        checkers = new Checkers(); // initializes model for the game
-        status = statusInit; // initializes the status JLabel
+        // initialize instances
+        checkers = new Checkers();
+        status = statusInit;
 
-        /*
-         * Listens for mouseclicks. Updates the model, then updates the game
-         * board based off of the updated model.
-         */
+        // listens for mouse clicks
         addMouseListeners();
     }
 
-    public void addMouseListeners() {
+    /**
+     * Listens for mouse clicks and updates the model based on user interaction.
+     * User presses which checker piece
+     * they want to move, and where they want to move it to. Adjusts checker's model
+     * based on this interaction.
+     */
+    private void addMouseListeners() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                Point p = e.getPoint();
+                // if player's turn is over, don't let them continue moving pieces
+                if (checkers.getTurnOver()) {
+                    return;
+                }
                 // updates the model given the coordinates of the mouseclick
+                Point p = e.getPoint();
                 checkers.selectPieceToMove(p.x / 100, p.y / 100);
                 updateStatus(); // updates the status JLabel
-                //repaint(); // repaints the game board
-                System.out.println("Game state when clicking piece:");
-                checkers.printGameState();
-
+                repaint(); // repaints game board
             }
         });
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 Point p = e.getPoint();
-                // updates the model given the coordinates of the mouseclick
                 checkers.selectPieceToMoveTo(p.x / 100, p.y / 100);
-                updateStatus(); // updates the status JLabel
-                repaint(); // repaints the game board
-                System.out.println("Game state when moving piece:");
-                checkers.printGameState();
+                updateStatus();
+                repaint();
             }
         });
     }
@@ -76,16 +81,74 @@ public class GameBoard extends JPanel {
         checkers.reset();
         status.setText("Red Player's Turn");
         repaint();
-        // Makes sure this component has keyboard/mouse focus
-        requestFocusInWindow();
+        requestFocusInWindow(); // makes sure this component has keyboard/mouse focus
     }
 
+    /**
+     * Allows player to undo their last move.
+     */
     public void undo() {
         checkers.undo();
         repaint();
-        addMouseListeners();
     }
 
+    /**
+     *
+     */
+    public void save() {
+        ArrayList<String> thingsToSave = new ArrayList<String>();
+        int[][] savedBoard = checkers.getBoard();
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                thingsToSave.add("" + savedBoard[r][c]);
+            }
+        }
+        thingsToSave.add("" + checkers.getCurrentPlayer());
+        thingsToSave.add("" + checkers.getGameOver());
+        thingsToSave.add("" + checkers.getTurnOver());
+        thingsToSave.add("" + checkers.getPlayerRedPieces());
+        thingsToSave.add("" + checkers.getPlayerWhitePieces());
+
+        LinkedList<Move> redPlayerMoves = checkers.getPlayerRedMoves();
+        if (!redPlayerMoves.isEmpty() && redPlayerMoves.size() > 1) {
+            thingsToSave.add("" + redPlayerMoves.getLast().getC());
+            thingsToSave.add("" + redPlayerMoves.getLast().getR());
+            thingsToSave.add("" + redPlayerMoves.get(redPlayerMoves.size() - 2).getC());
+            thingsToSave.add("" + redPlayerMoves.get(redPlayerMoves.size() - 2).getR());
+        } else {
+            thingsToSave.add("null");
+        }
+        LinkedList<Move> whitePlayerMoves = checkers.getPlayerWhiteMoves();
+        if (!whitePlayerMoves.isEmpty()) {
+            thingsToSave.add("" + whitePlayerMoves.getLast().getC());
+            thingsToSave.add("" + whitePlayerMoves.getLast().getR());
+        } else {
+            thingsToSave.add("null");
+        }
+        LinkedList<Move> skippedMoves = checkers.getSkippedPieces();
+        if (!skippedMoves.isEmpty()) {
+            thingsToSave.add("" + skippedMoves.getLast().getC());
+            thingsToSave.add("" + skippedMoves.getLast().getR());
+        } else {
+            thingsToSave.add("null");
+        }
+        checkers.save(thingsToSave);
+    }
+
+    public void load() {
+        checkers.load();
+        if (checkers.getCurrentPlayer()) {
+            status.setText("Red Player's Turn");
+        } else {
+            status.setText("White Player's Turn");
+        }
+        repaint();
+        requestFocusInWindow();
+    }
+
+    /**
+     * Switches whose turn it is between the Red and White player.
+     */
     public void switchPlayers() {
         checkers.switchPlayers();
     }
@@ -99,39 +162,39 @@ public class GameBoard extends JPanel {
         } else {
             status.setText("White Player's Turn");
         }
-        System.out.println("Red:" + checkers.getPlayerRedPieces());
-        System.out.println("White" + checkers.getPlayerWhitePieces());
         int winner = checkers.checkWinner();
         if (winner == 1) {
             status.setText("Red Player wins!");
         } else if (winner == 2) {
             status.setText("White Player wins!");
-        } else if (winner == 3) {
-            status.setText("It's a tie.");
         }
     }
 
     /**
+     * Updates when a player's turn is over.
+     */
+    public void updateTurnOver() {
+        checkers.changeTurnOver();
+    }
+
+    /**
      * Draws the game board.
-     * 
-     * There are many ways to draw a game board. This approach
-     * will not be sufficient for most games, because it is not
-     * modular. All of the logic for drawing the game board is
-     * in this method, and it does not take advantage of helper
-     * methods. Consider breaking up your paintComponent logic
-     * into multiple methods or classes, like Mushroom of Doom.
      */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Draws board grid
         drawBoard(g);
         drawBlackCheckers(g);
         drawWhiteCheckers(g);
         drawCheckerPieces(g);
+        System.out.println("Board");
+checkers.printGameState();
     }
 
-    public void drawBoard(Graphics g) {
+    /**
+     * Helper function for drawing game board.
+     */
+    private void drawBoard(Graphics g) {
         g.drawLine(100, 0, 100, 800);
         g.drawLine(200, 0, 200, 800);
         g.drawLine(0, 100, 800, 100);
@@ -150,7 +213,10 @@ public class GameBoard extends JPanel {
         g.drawLine(0, 800, 800, 800);
     }
 
-    public void drawBlackCheckers(Graphics g) {
+    /**
+     * Helper function for drawing game board's checkers.
+     */
+    private void drawBlackCheckers(Graphics g) {
         g.setColor(Color.black);
         for (int r = 0; r < 800; r = r + 200) {
             for (int c = 0; c < 800; c = c + 200) {
@@ -164,7 +230,10 @@ public class GameBoard extends JPanel {
         }
     }
 
-    public void drawWhiteCheckers(Graphics g) {
+    /**
+     * Helper function for drawing game board's checkers.
+     */
+    private void drawWhiteCheckers(Graphics g) {
         g.setColor(Color.white);
         for (int r = 0; r < 800; r = r + 200) {
             for (int c = 100; c < 800; c = c + 200) {
@@ -178,24 +247,30 @@ public class GameBoard extends JPanel {
         }
     }
 
-    public void drawCheckerPieces(Graphics g) {
-        checkers.printGameState();
-        for (int r = 0; r < 800; r=r+100) {
-            for (int c = 0; c < 800; c=c+100) {
+    /**
+     * Helper function for drawing game board's checker pieces.
+     */
+    private void drawCheckerPieces(Graphics g) {
+        for (int r = 0; r < 800; r = r + 100) {
+            for (int c = 0; c < 800; c = c + 100) {
                 int row = returnClipped(r);
                 int col = returnClipped(c);
-                int player = checkers.getCell(col, row);
-                if (player == 1) {
+                int state = checkers.getCell(col, row);
+                if (state == 1) {
+                    // red checker
                     g.setColor(Color.red);
                     g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
-                } else if (player == 2) {
+                } else if (state == 2) {
+                    // white checker
                     g.setColor(Color.white);
                     g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
-                } else if (player == 3) {
+                } else if (state == 3) {
+                    // red king
                     g.setColor(Color.red);
                     g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
                     g.drawString("K", 30 + 100 * col, 30 + 100 * row);
-                } else if (player == 4) {
+                } else if (state == 4) {
+                    // white king
                     g.setColor(Color.white);
                     g.fillOval(30 + 100 * col, 30 + 100 * row, 40, 40);
                     g.drawString("K", 30 + 100 * col, 30 + 100 * row);
@@ -204,7 +279,17 @@ public class GameBoard extends JPanel {
         }
     }
 
-    public int returnClipped(int v) {
+    /**
+     * Helper function for finding clipped version of row and column of given
+     * position in the game board.
+     * 
+     * @param v - position value that needs to be clipped to be found within the
+     *          game board
+     * @return 0 if it is 0 to avoid int division by 0, otherwise the value divided
+     *         by 100 so that the value is
+     *         downsized to the 2D array size of checkers model
+     */
+    private int returnClipped(int v) {
         if (v == 0) {
             return 0;
         } else {
