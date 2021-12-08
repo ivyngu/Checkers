@@ -77,18 +77,41 @@ public class Checkers {
             playerRedMoves = new LinkedList<>();
             String next = br.readLine();
             if (!next.equals("null")) {
-                playerRedMoves.add(new Move(Integer.parseInt(next), Integer.parseInt(br.readLine())));
-                playerRedMoves.add(new Move(Integer.parseInt(br.readLine()), Integer.parseInt(br.readLine())));
+                Move secondToLastMove = new Move(
+                        Integer.parseInt(next), Integer.parseInt(br.readLine())
+                );
+                secondToLastMove.setIdentity(Integer.parseInt(br.readLine()));
+                playerRedMoves.add(secondToLastMove);
+                Move lastMove = new Move(
+                        Integer.parseInt(br.readLine()), Integer.parseInt(br.readLine())
+                );
+                lastMove.setWasJump(Boolean.parseBoolean(br.readLine()));
+                lastMove.setIdentity(Integer.parseInt(br.readLine()));
+                playerRedMoves.add(lastMove);
             }
             playerWhiteMoves = new LinkedList<>();
             String nextNext = br.readLine();
             if (!nextNext.equals("null")) {
-                playerWhiteMoves.add(new Move(Integer.parseInt(nextNext), Integer.parseInt(br.readLine())));
+                Move secondToLastMove = new Move(
+                        Integer.parseInt(nextNext), Integer.parseInt(br.readLine())
+                );
+                secondToLastMove.setIdentity(Integer.parseInt(br.readLine()));
+                playerWhiteMoves.add(secondToLastMove);
+                Move lastMove = new Move(
+                        Integer.parseInt(br.readLine()), Integer.parseInt(br.readLine())
+                );
+                lastMove.setWasJump(Boolean.parseBoolean(br.readLine()));
+                lastMove.setIdentity(Integer.parseInt(br.readLine()));
+                playerWhiteMoves.add(lastMove);
             }
             skippedPieces = new LinkedList<>();
             String nextNextNext = br.readLine();
             if (!nextNextNext.equals("null")) {
-                skippedPieces.add(new Move(Integer.parseInt(nextNextNext), Integer.parseInt(br.readLine())));
+                Move skippedPiece = new Move(
+                        Integer.parseInt(nextNextNext), Integer.parseInt(br.readLine())
+                );
+                skippedPiece.setIdentity(Integer.parseInt(br.readLine()));
+                skippedPieces.add(skippedPiece);
             }
             br.close();
         } catch (FileNotFoundException e) {
@@ -174,12 +197,14 @@ public class Checkers {
         // if a selected piece is something you can move, then move it or else do
         // nothing
         Move thisMove = new Move(c, r);
+        thisMove.setIdentity(board[r][c]);
         if (isRedPlayerPiece(c, r)) {
             playerRedMoves.add(thisMove);
+            adjustBoardToPossibleMoves(findPossibleMoves(c, r));
         } else if (isWhitePlayerPiece(c, r)) {
             playerWhiteMoves.add(thisMove);
+            adjustBoardToPossibleMoves(findPossibleMoves(c, r));
         }
-        adjustBoardToPossibleMoves(findPossibleMoves(c, r));
     }
 
     private boolean isRedPlayerPiece(int c, int r) {
@@ -233,7 +258,11 @@ public class Checkers {
         } else if (!playerRedTurn && !gameOver) {
             ArrayList<Move> movesBackward = findBlankSpacesBackward(c, r);
             totalMoves.addAll(movesBackward);
+            System.out.println("in find poss");
+
             if (jumpPossible(c, r)) {
+                System.out.println("in jump poss");
+
                 ArrayList<Move> jumpBackward = findJumpsBackward(c, r);
                 totalMoves.addAll(jumpBackward);
             }
@@ -345,31 +374,48 @@ public class Checkers {
      */
     private boolean jumpPossible(int c, int r) {
         // forward, left jump
+        System.out.println("inJumpPoss");
         if ((r + 1 < 8) && (c - 1 > -1)) {
+            System.out.println("inJumpPoss1");
+
             if (isRedPlayerPieceJump(c - 1, r + 1) || isWhitePlayerPieceJump(c - 1, r + 1)) {
+                System.out.println("inJumpPoss2");
+
                 return ((c - 2 > -1) && (r + 2 < 8));
             }
         }
-            // forward, right jump
-            if ((r + 1 < 8) && (c + 1 < 8)) {
-                if (isRedPlayerPieceJump(c + 1, r + 1) || isWhitePlayerPieceJump(c + 1, r + 1)) {
-                    return ((c + 2 < 8) && (r + 2 < 8));
-                }
+        // forward, right jump
+        if ((r + 1 < 8) && (c + 1 < 8)) {
+            System.out.println("inJumpPoss3");
+
+            if (isRedPlayerPieceJump(c + 1, r + 1) || isWhitePlayerPieceJump(c + 1, r + 1)) {
+                System.out.println("inJumpPoss4");
+
+                return ((c + 2 < 8) && (r + 2 < 8));
             }
-            // backward, left jump
-            if ((r - 1 > -1) && (c - 1 > -1)) {
-                if (isRedPlayerPieceJump(c - 1, r - 1) || isWhitePlayerPieceJump(c - 1, r - 1)) {
-                    return ((c - 2 > -1) && (r - 2 > -1));
-                }
-            }
-            // backward, right jump
-            if ((r - 1 > -1) && (c + 1 < 8)) {
-                if (isRedPlayerPieceJump(c + 1, r - 1) || isWhitePlayerPieceJump(c + 1, r - 1)) {
-                    return ((c + 2 < 8) && (r - 2 > -1));
-                }
-            }
-            return false;
         }
+        // backward, left jump
+        if ((r - 1 > -1) && (c - 1 > -1)) {
+            System.out.println("inJumpPoss5");
+
+            if (isRedPlayerPieceJump(c - 1, r - 1) || isWhitePlayerPieceJump(c - 1, r - 1)) {
+                System.out.println("inJumpPoss6");
+
+                return ((c - 2 > -1) && (r - 2 > -1));
+            }
+        }
+        // backward, right jump
+        if ((r - 1 > -1) && (c + 1 < 8)) {
+            System.out.println("inJumpPoss7");
+
+            if (isRedPlayerPieceJump(c + 1, r - 1) || isWhitePlayerPieceJump(c + 1, r - 1)) {
+                System.out.println("inJumpPoss8");
+
+                return ((c + 2 < 8) && (r - 2 > -1));
+            }
+        }
+        return false;
+    }
 
     /**
      * Finds possible spaces to jump to in the forward direction of the checkerboard
@@ -381,7 +427,7 @@ public class Checkers {
      *         for a checker piece
      */
     private ArrayList<Move> findJumpsForward(int c, int r) {
-        ArrayList<Move> moves = new ArrayList<Move>();
+        ArrayList<Move> moves = new ArrayList<>();
         // forward, left
         if ((r + 1 < 8) && (c - 1 > -1)) {
             if (isRedPlayerPieceJump(c - 1, r + 1) || isWhitePlayerPieceJump(c - 1, r + 1)) {
@@ -393,7 +439,7 @@ public class Checkers {
             }
         }
         // forward, right
-        if ((r + 1 < 8) && (c + 1 < 8))  {
+        if ((r + 1 < 8) && (c + 1 < 8)) {
             if (isRedPlayerPieceJump(c + 1, r + 1) || isWhitePlayerPieceJump(c + 1, r + 1)) {
                 if ((r + 2 < 8) && (c + 2 < 8)) {
                     if (isBlankSpace(c + 2, r + 2)) {
@@ -428,9 +474,16 @@ public class Checkers {
         }
         // backward, right
         if ((r - 1 > -1) && (c + 1 < 8)) {
+            System.out.println("here");
             if (isRedPlayerPieceJump(c + 1, r - 1) || isWhitePlayerPieceJump(c + 1, r - 1)) {
+                System.out.println("here2");
+
                 if ((r - 2 > -1) && (c + 2 < 8)) {
+                    System.out.println("here3");
+
                     if (isBlankSpace(c + 2, r - 2)) {
+                        System.out.println("here4");
+
                         moves.add(new Move(c + 2, r - 2));
                     }
                 }
@@ -462,7 +515,8 @@ public class Checkers {
      * @param r - row of location of where to move chosen checker piece to
      */
     public void selectPieceToMoveTo(int c, int r) {
-        // if the location is not a valid place for the checker piece to be moved to, don't
+        // if the location is not a valid place for the checker piece to be moved to,
+        // don't
         if ((board[r][c] != 5) || gameOver) {
             return;
         }
@@ -474,9 +528,10 @@ public class Checkers {
             int lastR = lastMove.getR();
             int identity = lastMove.getIdentity();
             // set new location to new assigned number
-            if (kingStatus(r) || previousKingStatus(lastC, lastR)) {
+            if (kingStatus(r) || lastMove.getIdentity() == 3) {
+                thisMove.setIdentity(3);
                 board[r][c] = 3;
-            } else if (!kingStatus(r) || !previousKingStatus(lastC, lastR)) {
+            } else if (!kingStatus(r) || lastMove.getIdentity() != 3) {
                 board[r][c] = 1;
             }
             // if a checker piece can jump
@@ -499,9 +554,10 @@ public class Checkers {
             Move lastMove = playerWhiteMoves.getLast();
             int lastC = lastMove.getC();
             int lastR = lastMove.getR();
-            if (kingStatus(r) || previousKingStatus(lastC, lastR)) {
+            if (kingStatus(r) || lastMove.getIdentity() == 4) {
+                thisMove.setIdentity(4);
                 board[r][c] = 4;
-            } else if (!kingStatus(r) || !previousKingStatus(lastC, lastR)) {
+            } else if (!kingStatus(r) || lastMove.getIdentity() == 2) {
                 board[r][c] = 2;
             }
             if (jumpPossible(lastC, lastR)) {
@@ -517,7 +573,8 @@ public class Checkers {
             board[lastR][lastC] = 0;
             playerWhiteMoves.add(thisMove);
         }
-        // reset the board to before it showed possible moves & set the turn to be the next player's
+        // reset the board to before it showed possible moves & set the turn to be the
+        // next player's
         resetOldPossibleMoves();
         turnOver = true;
     }
@@ -560,12 +617,12 @@ public class Checkers {
         }
         // backward, left jump
         if ((r + 1 < 8) && (c + 1 < 8)) {
-            if ((isRedPlayerPieceJump(c + 1, r + 1)) || (isWhitePlayerPieceJump(c + 1, r + 1)))  {
+            if ((isRedPlayerPieceJump(c + 1, r + 1)) || (isWhitePlayerPieceJump(c + 1, r + 1))) {
                 return successfulSkip(c, r, lastMove);
             }
         }
         // forward, left jump
-        if ((r -1 > -1) && (c - 1 > -1)) {
+        if ((r - 1 > -1) && (c - 1 > -1)) {
             if ((isRedPlayerPieceJump(c - 1, r - 1)) || (isWhitePlayerPieceJump(c - 1, r - 1))) {
                 return successfulSkip(c, r, lastMove);
             }
@@ -612,7 +669,6 @@ public class Checkers {
         // allow player to make another move
         turnOver = false;
         if (playerRedTurn && playerRedMoves.size() > 1) {
-            System.out.println("made it");
             Move lastMove = playerRedMoves.getLast();
             int lastR = lastMove.getR();
             int lastC = lastMove.getC();
@@ -627,9 +683,11 @@ public class Checkers {
                 } else if (skippedIdentity == 4) {
                     board[skippedR][skippedC] = 4;
                 }
+                playerWhitePieces++;
             }
             // save identity of last move to fill it in later as king or not
-            int identity = getCell(lastC, lastR);
+            int identity = lastMove.getIdentity();
+            System.out.println(identity);
             // delete most recent move
             board[lastR][lastC] = 0;
             playerRedMoves.removeLast();
@@ -657,8 +715,9 @@ public class Checkers {
                 } else if (skippedIdentity == 3) {
                     board[skippedR][skippedC] = 3;
                 }
+                playerRedPieces++;
             }
-            int identity = getCell(lastC, lastR);
+            int identity = lastMove.getIdentity();
             board[lastR][lastC] = 0;
             playerWhiteMoves.removeLast();
             Move secondLastMove = playerWhiteMoves.getLast();

@@ -111,17 +111,26 @@ public class GameBoard extends JPanel {
 
         LinkedList<Move> redPlayerMoves = checkers.getPlayerRedMoves();
         if (!redPlayerMoves.isEmpty() && redPlayerMoves.size() > 1) {
-            thingsToSave.add("" + redPlayerMoves.getLast().getC());
-            thingsToSave.add("" + redPlayerMoves.getLast().getR());
             thingsToSave.add("" + redPlayerMoves.get(redPlayerMoves.size() - 2).getC());
             thingsToSave.add("" + redPlayerMoves.get(redPlayerMoves.size() - 2).getR());
+            thingsToSave.add("" + redPlayerMoves.get(redPlayerMoves.size() - 2).getIdentity());
+            thingsToSave.add("" + redPlayerMoves.getLast().getC());
+            thingsToSave.add("" + redPlayerMoves.getLast().getR());
+            thingsToSave.add("" + redPlayerMoves.getLast().getWasJump());
+            thingsToSave.add("" + redPlayerMoves.getLast().getIdentity());
+
         } else {
             thingsToSave.add("null");
         }
         LinkedList<Move> whitePlayerMoves = checkers.getPlayerWhiteMoves();
         if (!whitePlayerMoves.isEmpty()) {
+            thingsToSave.add("" + whitePlayerMoves.get(whitePlayerMoves.size() - 2).getC());
+            thingsToSave.add("" + whitePlayerMoves.get(whitePlayerMoves.size() - 2).getR());
+            thingsToSave.add("" + whitePlayerMoves.get(whitePlayerMoves.size() - 2).getIdentity());
             thingsToSave.add("" + whitePlayerMoves.getLast().getC());
             thingsToSave.add("" + whitePlayerMoves.getLast().getR());
+            thingsToSave.add("" + whitePlayerMoves.getLast().getWasJump());
+            thingsToSave.add("" + whitePlayerMoves.getLast().getIdentity());
         } else {
             thingsToSave.add("null");
         }
@@ -129,6 +138,7 @@ public class GameBoard extends JPanel {
         if (!skippedMoves.isEmpty()) {
             thingsToSave.add("" + skippedMoves.getLast().getC());
             thingsToSave.add("" + skippedMoves.getLast().getR());
+            thingsToSave.add("" + skippedMoves.getLast().getIdentity());
         } else {
             thingsToSave.add("null");
         }
@@ -188,7 +198,7 @@ public class GameBoard extends JPanel {
         drawWhiteCheckers(g);
         drawCheckerPieces(g);
         System.out.println("Board");
-checkers.printGameState();
+        checkers.printGameState();
     }
 
     /**

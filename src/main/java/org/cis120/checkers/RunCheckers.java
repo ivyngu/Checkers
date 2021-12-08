@@ -51,6 +51,11 @@ public class RunCheckers implements Runnable {
                                 "6. If a player can skip a checker piece, they are only allowed to skip one at once. No "
                                 +
                                 "double jumps allowed.\n" +
+                                "7. Players can only undo their own last move if they have made one during their turn."
+                                +
+                                "Players cannot go back 2 moves or more. This goes for playing a saved or non-saved"
+                                +
+                                "game.\n" +
                                 "Controls:\n" +
                                 "- Click on the piece you want to move with the mouse.\n" +
                                 "- Click to where you want to move it to with the mouse.\n" +
