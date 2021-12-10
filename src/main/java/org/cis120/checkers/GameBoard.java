@@ -93,10 +93,10 @@ public class GameBoard extends JPanel {
     }
 
     /**
-     *
+     * Allows player to save current game to reload later on.
      */
     public void save() {
-        ArrayList<String> thingsToSave = new ArrayList<String>();
+        ArrayList<String> thingsToSave = new ArrayList<>();
         int[][] savedBoard = checkers.getBoard();
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
@@ -118,12 +118,12 @@ public class GameBoard extends JPanel {
             thingsToSave.add("" + redPlayerMoves.getLast().getR());
             thingsToSave.add("" + redPlayerMoves.getLast().getWasJump());
             thingsToSave.add("" + redPlayerMoves.getLast().getIdentity());
-
         } else {
             thingsToSave.add("null");
         }
+
         LinkedList<Move> whitePlayerMoves = checkers.getPlayerWhiteMoves();
-        if (!whitePlayerMoves.isEmpty()) {
+        if (!whitePlayerMoves.isEmpty() && whitePlayerMoves.size() > 1) {
             thingsToSave.add("" + whitePlayerMoves.get(whitePlayerMoves.size() - 2).getC());
             thingsToSave.add("" + whitePlayerMoves.get(whitePlayerMoves.size() - 2).getR());
             thingsToSave.add("" + whitePlayerMoves.get(whitePlayerMoves.size() - 2).getIdentity());
@@ -134,6 +134,7 @@ public class GameBoard extends JPanel {
         } else {
             thingsToSave.add("null");
         }
+
         LinkedList<Move> skippedMoves = checkers.getSkippedPieces();
         if (!skippedMoves.isEmpty()) {
             thingsToSave.add("" + skippedMoves.getLast().getC());
@@ -142,9 +143,13 @@ public class GameBoard extends JPanel {
         } else {
             thingsToSave.add("null");
         }
+
         checkers.save(thingsToSave);
     }
 
+    /**
+     * Allows player to reload last saved game.
+     */
     public void load() {
         checkers.load();
         if (checkers.getCurrentPlayer()) {
@@ -197,8 +202,6 @@ public class GameBoard extends JPanel {
         drawBlackCheckers(g);
         drawWhiteCheckers(g);
         drawCheckerPieces(g);
-        System.out.println("Board");
-        checkers.printGameState();
     }
 
     /**

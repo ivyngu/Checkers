@@ -44,6 +44,13 @@ public class Checkers {
         skippedPieces = new LinkedList<>();
     }
 
+    /**
+     * Creates a Buffered Writer to write into a file current game state so users
+     * can save the current game.
+     * 
+     * @param stringsToWrite information on game state that should be saved within
+     *                       the file
+     */
     public void save(ArrayList<String> stringsToWrite) {
         File gameProgress = new File("checkersProgress");
         BufferedWriter bw;
@@ -59,8 +66,12 @@ public class Checkers {
         }
     }
 
+    /**
+     * Creates Buffered Reader to read through file that stores last played game's
+     * game state so that user can reload
+     * their last played game into the game board.
+     */
     public void load() {
-        System.out.println("loaded");
         try {
             BufferedReader br = new BufferedReader(new FileReader("checkersProgress"));
             board = new int[8][8];
@@ -75,10 +86,10 @@ public class Checkers {
             playerRedPieces = Integer.parseInt(br.readLine());
             playerWhitePieces = Integer.parseInt(br.readLine());
             playerRedMoves = new LinkedList<>();
-            String next = br.readLine();
-            if (!next.equals("null")) {
+            String redPlay = br.readLine();
+            if (!redPlay.equals("null")) {
                 Move secondToLastMove = new Move(
-                        Integer.parseInt(next), Integer.parseInt(br.readLine())
+                        Integer.parseInt(redPlay), Integer.parseInt(br.readLine())
                 );
                 secondToLastMove.setIdentity(Integer.parseInt(br.readLine()));
                 playerRedMoves.add(secondToLastMove);
@@ -90,10 +101,10 @@ public class Checkers {
                 playerRedMoves.add(lastMove);
             }
             playerWhiteMoves = new LinkedList<>();
-            String nextNext = br.readLine();
-            if (!nextNext.equals("null")) {
+            String whitePlay = br.readLine();
+            if (!whitePlay.equals("null")) {
                 Move secondToLastMove = new Move(
-                        Integer.parseInt(nextNext), Integer.parseInt(br.readLine())
+                        Integer.parseInt(whitePlay), Integer.parseInt(br.readLine())
                 );
                 secondToLastMove.setIdentity(Integer.parseInt(br.readLine()));
                 playerWhiteMoves.add(secondToLastMove);
@@ -105,10 +116,10 @@ public class Checkers {
                 playerWhiteMoves.add(lastMove);
             }
             skippedPieces = new LinkedList<>();
-            String nextNextNext = br.readLine();
-            if (!nextNextNext.equals("null")) {
+            String skipped = br.readLine();
+            if (!skipped.equals("null")) {
                 Move skippedPiece = new Move(
-                        Integer.parseInt(nextNextNext), Integer.parseInt(br.readLine())
+                        Integer.parseInt(skipped), Integer.parseInt(br.readLine())
                 );
                 skippedPiece.setIdentity(Integer.parseInt(br.readLine()));
                 skippedPieces.add(skippedPiece);
@@ -118,9 +129,9 @@ public class Checkers {
             System.out.println("File Not Found");
             throw new IllegalArgumentException();
         } catch (IOException e) {
+            System.out.println("Reader cannot read file.");
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -200,17 +211,33 @@ public class Checkers {
         thisMove.setIdentity(board[r][c]);
         if (isRedPlayerPiece(c, r)) {
             playerRedMoves.add(thisMove);
-            adjustBoardToPossibleMoves(findPossibleMoves(c, r));
+            adjustBoardToPossibleMoves(findPossibleMoves(thisMove));
         } else if (isWhitePlayerPiece(c, r)) {
             playerWhiteMoves.add(thisMove);
-            adjustBoardToPossibleMoves(findPossibleMoves(c, r));
+            adjustBoardToPossibleMoves(findPossibleMoves(thisMove));
         }
     }
 
+    /**
+     * Helper function for determining if player pressed red checker piece.
+     * 
+     * @param c - column of checker piece pressed
+     * @param r - row of checker piece pressed
+     * @return boolean that is true if red checker piece at that location in board,
+     *         false otherwise
+     */
     private boolean isRedPlayerPiece(int c, int r) {
         return (playerRedTurn && (board[r][c] == 1)) || (playerRedTurn && (board[r][c] == 3));
     }
 
+    /**
+     * Helper function for determining if player pressed white checker piece.
+     * 
+     * @param c - column of checker piece pressed
+     * @param r - row of checker piece pressed
+     * @return boolean that is true if white checker piece at that location in
+     *         board, false otherwise
+     */
     private boolean isWhitePlayerPiece(int c, int r) {
         return (!playerRedTurn && (board[r][c] == 2)) || (!playerRedTurn && (board[r][c] == 4));
     }
@@ -231,12 +258,15 @@ public class Checkers {
      * Finds possible moves that a checker piece can move to & adjusts the board so
      * that move can be made.
      *
-     * @param c - column of selected piece to be moved
-     * @param r - row of selected piece to be moved
+     * @param thisMove - Move of current checker piece that user is selecting to
+     *                 move
      * @return a list of possible moves that a checker piece can make
      */
-    public ArrayList<Move> findPossibleMoves(int c, int r) {
+    private ArrayList<Move> findPossibleMoves(Move thisMove) {
         ArrayList<Move> totalMoves = new ArrayList<>();
+        int c = thisMove.getC();
+        int r = thisMove.getR();
+        int identity = thisMove.getIdentity();
         // if it's the red player, find where they can move/jump to
         if (playerRedTurn && !gameOver) {
             // if it's not a king, can only move in one direction
@@ -247,7 +277,7 @@ public class Checkers {
                 totalMoves.addAll(jumpForward);
             }
             // if it's a king, then it can move all ways
-            if (kingStatus(r) || previousKingStatus(c, r)) {
+            if (kingStatus(r) || identity == 3) {
                 ArrayList<Move> movesBackward = findBlankSpacesBackward(c, r);
                 totalMoves.addAll(movesBackward);
                 if (jumpPossible(c, r)) {
@@ -258,15 +288,11 @@ public class Checkers {
         } else if (!playerRedTurn && !gameOver) {
             ArrayList<Move> movesBackward = findBlankSpacesBackward(c, r);
             totalMoves.addAll(movesBackward);
-            System.out.println("in find poss");
-
             if (jumpPossible(c, r)) {
-                System.out.println("in jump poss");
-
                 ArrayList<Move> jumpBackward = findJumpsBackward(c, r);
                 totalMoves.addAll(jumpBackward);
             }
-            if (kingStatus(r) || previousKingStatus(c, r)) {
+            if (kingStatus(r) || identity == 4) {
                 ArrayList<Move> movesForward = findBlankSpacesForward(c, r);
                 totalMoves.addAll(movesForward);
                 if (jumpPossible(c, r)) {
@@ -305,7 +331,7 @@ public class Checkers {
 
     /**
      * Helper function for determining if given position in board is a white
-     * player's piece or not.
+     * player's piece or not for determining a jump.
      *
      * @param c - column value of piece that is an int
      * @param r - row value of piece that is an int
@@ -374,43 +400,26 @@ public class Checkers {
      */
     private boolean jumpPossible(int c, int r) {
         // forward, left jump
-        System.out.println("inJumpPoss");
         if ((r + 1 < 8) && (c - 1 > -1)) {
-            System.out.println("inJumpPoss1");
-
             if (isRedPlayerPieceJump(c - 1, r + 1) || isWhitePlayerPieceJump(c - 1, r + 1)) {
-                System.out.println("inJumpPoss2");
-
                 return ((c - 2 > -1) && (r + 2 < 8));
             }
         }
         // forward, right jump
         if ((r + 1 < 8) && (c + 1 < 8)) {
-            System.out.println("inJumpPoss3");
-
             if (isRedPlayerPieceJump(c + 1, r + 1) || isWhitePlayerPieceJump(c + 1, r + 1)) {
-                System.out.println("inJumpPoss4");
-
                 return ((c + 2 < 8) && (r + 2 < 8));
             }
         }
         // backward, left jump
         if ((r - 1 > -1) && (c - 1 > -1)) {
-            System.out.println("inJumpPoss5");
-
             if (isRedPlayerPieceJump(c - 1, r - 1) || isWhitePlayerPieceJump(c - 1, r - 1)) {
-                System.out.println("inJumpPoss6");
-
                 return ((c - 2 > -1) && (r - 2 > -1));
             }
         }
         // backward, right jump
         if ((r - 1 > -1) && (c + 1 < 8)) {
-            System.out.println("inJumpPoss7");
-
             if (isRedPlayerPieceJump(c + 1, r - 1) || isWhitePlayerPieceJump(c + 1, r - 1)) {
-                System.out.println("inJumpPoss8");
-
                 return ((c + 2 < 8) && (r - 2 > -1));
             }
         }
@@ -474,16 +483,9 @@ public class Checkers {
         }
         // backward, right
         if ((r - 1 > -1) && (c + 1 < 8)) {
-            System.out.println("here");
             if (isRedPlayerPieceJump(c + 1, r - 1) || isWhitePlayerPieceJump(c + 1, r - 1)) {
-                System.out.println("here2");
-
                 if ((r - 2 > -1) && (c + 2 < 8)) {
-                    System.out.println("here3");
-
                     if (isBlankSpace(c + 2, r - 2)) {
-                        System.out.println("here4");
-
                         moves.add(new Move(c + 2, r - 2));
                     }
                 }
@@ -528,10 +530,10 @@ public class Checkers {
             int lastR = lastMove.getR();
             int identity = lastMove.getIdentity();
             // set new location to new assigned number
-            if (kingStatus(r) || lastMove.getIdentity() == 3) {
+            if (kingStatus(r) || identity == 3) {
                 thisMove.setIdentity(3);
                 board[r][c] = 3;
-            } else if (!kingStatus(r) || lastMove.getIdentity() != 3) {
+            } else if (!kingStatus(r) || identity != 3) {
                 board[r][c] = 1;
             }
             // if a checker piece can jump
@@ -554,10 +556,11 @@ public class Checkers {
             Move lastMove = playerWhiteMoves.getLast();
             int lastC = lastMove.getC();
             int lastR = lastMove.getR();
-            if (kingStatus(r) || lastMove.getIdentity() == 4) {
+            int identity = lastMove.getIdentity();
+            if (kingStatus(r) || identity == 4) {
                 thisMove.setIdentity(4);
                 board[r][c] = 4;
-            } else if (!kingStatus(r) || lastMove.getIdentity() == 2) {
+            } else if (!kingStatus(r) || identity == 2) {
                 board[r][c] = 2;
             }
             if (jumpPossible(lastC, lastR)) {
@@ -683,11 +686,11 @@ public class Checkers {
                 } else if (skippedIdentity == 4) {
                     board[skippedR][skippedC] = 4;
                 }
+                skippedPieces.removeLast();
                 playerWhitePieces++;
             }
             // save identity of last move to fill it in later as king or not
             int identity = lastMove.getIdentity();
-            System.out.println(identity);
             // delete most recent move
             board[lastR][lastC] = 0;
             playerRedMoves.removeLast();
@@ -716,6 +719,7 @@ public class Checkers {
                     board[skippedR][skippedC] = 3;
                 }
                 playerRedPieces++;
+                skippedPieces.removeLast();
             }
             int identity = lastMove.getIdentity();
             board[lastR][lastC] = 0;
@@ -744,17 +748,6 @@ public class Checkers {
         } else {
             return r == 0;
         }
-    }
-
-    /**
-     * Checks if a current checker piece was a King previously or not.
-     * 
-     * @param c - column of current checker piece to be checked
-     * @param r - row of current checker piece to be checked
-     * @return boolean that is true if the checker piece is a King, false otherwise
-     */
-    private boolean previousKingStatus(int c, int r) {
-        return board[r][c] == 3 || board[r][c] == 4;
     }
 
     /**
@@ -794,10 +787,6 @@ public class Checkers {
         }
     }
 
-    public int[][] getBoard() {
-        return board;
-    }
-
     /**
      * getCurrentPlayer is a getter for the player
      * whose turn it is in the game.
@@ -809,20 +798,13 @@ public class Checkers {
         return playerRedTurn;
     }
 
+    /**
+     * Getter for gameOver.
+     * 
+     * @return true if game is over, false if it isn't
+     */
     public boolean getGameOver() {
         return gameOver;
-    }
-
-    public LinkedList<Move> getPlayerRedMoves() {
-        return playerRedMoves;
-    }
-
-    public LinkedList<Move> getPlayerWhiteMoves() {
-        return playerWhiteMoves;
-    }
-
-    public LinkedList<Move> getSkippedPieces() {
-        return skippedPieces;
     }
 
     /**
@@ -857,12 +839,36 @@ public class Checkers {
         return playerWhitePieces;
     }
 
+    /**
+     * Getter for turnOver.
+     * 
+     * @return true if player's turn is over, false otherwise
+     */
     public boolean getTurnOver() {
         return turnOver;
     }
 
+    /**
+     * Modifies turnOver dependent on if a user already took a turn or not.
+     */
     public void changeTurnOver() {
         turnOver = !turnOver;
+    }
+
+    public int[][] getBoard() {
+        return board;
+    }
+
+    public LinkedList<Move> getPlayerRedMoves() {
+        return playerRedMoves;
+    }
+
+    public LinkedList<Move> getPlayerWhiteMoves() {
+        return playerWhiteMoves;
+    }
+
+    public LinkedList<Move> getSkippedPieces() {
+        return skippedPieces;
     }
 
 }

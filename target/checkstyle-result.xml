@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="8.29">
+<file name="/Users/ivynguyen/Downloads/cis120/hw09_local_temp/src/main/java/org/cis120/checkers/RunCheckers.java">
+</file>
+<file name="/Users/ivynguyen/Downloads/cis120/hw09_local_temp/src/main/java/org/cis120/checkers/GameBoard.java">
+</file>
+<file name="/Users/ivynguyen/Downloads/cis120/hw09_local_temp/src/main/java/org/cis120/checkers/Checkers.java">
+</file>
+<file name="/Users/ivynguyen/Downloads/cis120/hw09_local_temp/src/test/java/org/cis120/checkers/GameTest.java">
+</file>
+</checkstyle>

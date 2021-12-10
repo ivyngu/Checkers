@@ -1,10 +1,14 @@
 package org.cis120.checkers;
 
+/*
+ * This class keeps track of Moves made on the Checker Board by a player.
+ */
+
 public class Move {
-    private int c;
-    private int r;
-    private boolean wasJump;
-    private int identity;
+    private int c; // column of move made in board
+    private int r; // row of move made in baord
+    private boolean wasJump; // if move was jump or not
+    private int identity; // what type of piece it was (red or white, king)
 
     public Move(int c, int r) {
         this.c = c;
